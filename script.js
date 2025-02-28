@@ -54,11 +54,13 @@ const preguntas = [// array de preguntas, cada pregunta tiene 4 respuestas posib
 let preguntaActual = 0;
 
 function crearPaginaInicio() {
-    // borramos las secciones de preguntas y respuestas
+    // borramos las secciones de preguntas, respuestas y comodines
     const seccionPregunta = document.getElementById("preguntas");
     seccionPregunta.innerHTML = "";
     const seccionRespuestas = document.getElementById("respuestas");
     seccionRespuestas.innerHTML = "";
+    const seccionComodines = document.getElementById("comodines");
+    seccionComodines.innerHTML = "";
 
     // buscamos la sección 'menu' para mostrar el botón de comenzar
     const seccionInicio = document.getElementById("menu");
@@ -71,16 +73,47 @@ function crearPaginaInicio() {
         preguntaActual = 0;
         crearPregunta(); // creamos la primera pregunta
         crearComodines(); // creamos los comodines
+
     });
     seccionInicio.appendChild(botonComenzar);
 
+    document.addEventListener("click",crearAudioInicio);
+    
+}
+function pararAudios(){
+    const audios = document.getElementsByClassName("audio");
+    for(let i = 0; i < audios.length; i++){
+        audios[i].pause();
+    }
+}
+function crearAudioInicio(){
+    pararAudios();
+    const audio = document.getElementById("audioPlayerInicio");
+    audio.play();
+}
+function crearAudioPreguntas(){
+    pararAudios();
+    const audio = document.getElementById("audioPlayerPregunta");
+    audio.play();
+}
+function crearAudioRespuestaCorrecta(){
+    pararAudios();
+    const audio = document.getElementById("audioPlayerRespuestaCorrecta");
+   audio.play();
+}
+function crearAudioRespuestaIncorrecta(){
+    pararAudios();
+    const audio = document.getElementById("audioPlayerRespuestaIncorrecta");
+    audio.play();
 }
 function crearPaginaFinal() {
-    // borramos las secciones de preguntas y respuestas
+    // borramos las secciones de preguntas, respuestas y comodines
     const seccionPregunta = document.getElementById("preguntas");
     seccionPregunta.innerHTML = "";
     const seccionRespuestas = document.getElementById("respuestas");
     seccionRespuestas.innerHTML = "";
+    const seccionComodines = document.getElementById("comodines");
+    seccionComodines.innerHTML = "";
 
     // buscamos la sección 'menu' para mostrar la puntuación obtenida
     const seccionFinal = document.getElementById("menu");
@@ -99,14 +132,19 @@ function crearPaginaFinal() {
     });
     seccionFinal.appendChild(botonVolver);
 }
+
 function crearPregunta() {
     const pregunta = preguntas[preguntaActual];
     const seccionPregunta = document.getElementById("preguntas");
     seccionPregunta.innerHTML = ""; // vaciamos la sección para quitar la pregunta anterior
     const h2 = document.createElement("h2");
     h2.textContent = pregunta.pregunta;
+    const h3 = document.createElement("h3");
+    h3.textContent = "Pregunta " + (preguntaActual + 1) + " de " + preguntas.length;
+    seccionPregunta.appendChild(h3);
     seccionPregunta.appendChild(h2);
     crearRespuestas(pregunta);
+    crearAudioPreguntas();
 }
 function crearRespuestas(pregunta) {
     // creamos los botones de las respuestas
@@ -122,15 +160,16 @@ function crearRespuestas(pregunta) {
             if (i === pregunta.correcta) { // si la posición de la respuesta coincide con la correcta
                 respuesta.classList.add("correcta"); // le ponemos la clase correcta
                 preguntaActual++; // pasamos a la siguiente pregunta
-
+                crearAudioRespuestaCorrecta();
                 if(preguntaActual  >= preguntas.length) { // si ya no quedan preguntas
-                    setTimeout(crearPaginaFinal, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
+                    setTimeout(crearPaginaFinal, 2000); //  creamos la siguiente pregunta en 2 segundos (2000 milisegundos)
                 }else{
-                    setTimeout(crearPregunta, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
+                    setTimeout(crearPregunta, 2000); //  creamos la siguiente pregunta en 2 segundos (2000 milisegundos)
                 }
             } else {
+                crearAudioRespuestaIncorrecta();
                 respuesta.classList.add("incorrecta"); // le ponemos la clase incorrecta
-                setTimeout(crearPaginaFinal, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
+                setTimeout(crearPaginaFinal, 2000); //  creamos la siguiente pregunta en 2 segundos (2000 milisegundos)
             }
         })
         respuestas.push(respuesta);
@@ -155,11 +194,11 @@ function crearComodines(){
     seccionComodines.appendChild(comodin50);
     
     const comodinLlamada = document.createElement("button");
-    comodinLlamada.textContent = "Llamada";
+    comodinLlamada.innerHTML =`<i class="fa-solid fa-phone"></i>`;
     seccionComodines.appendChild(comodinLlamada);
 
     const comodinPublico = document.createElement("button");
-    comodinPublico.textContent = "Público";
+    comodinPublico.innerHTML = `<i class="fa-solid fa-user-group"></i>`;
     seccionComodines.appendChild(comodinPublico);
 
     // el comodin del 50% borra dos de las respuestas incorrectas
@@ -228,5 +267,4 @@ function crearComodines(){
     
 }
 
-//crearPregunta(preguntas,preguntaActual);
 crearPaginaInicio();
