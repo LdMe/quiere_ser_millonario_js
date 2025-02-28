@@ -53,7 +53,7 @@ const preguntas = [// array de preguntas, cada pregunta tiene 4 respuestas posib
 
 let preguntaActual = 0;
 
-function crearPregunta(preguntas,preguntaActual) {
+function crearPregunta() {
     const pregunta = preguntas[preguntaActual];
     const seccionPregunta = document.getElementById("preguntas");
     seccionPregunta.innerHTML = ""; // vaciamos la sección para quitar la pregunta anterior
@@ -73,10 +73,15 @@ function crearRespuestas(pregunta){
         respuesta.addEventListener("click", function() { // añadimos el listener para ver si es la correcta
             if(i === pregunta.correcta){ // si la posición de la respuesta coincide con la correcta
                 respuesta.classList.add("correcta"); // le ponemos la clase correcta
-                alert("Respuesta correcta!");
+                setTimeout(()=>{ alert("Respuesta correcta!");},500); // mostramos un mensaje dentro de medio segundo
+               
+                preguntaActual++; // pasamos a la siguiente pregunta
+                setTimeout(crearPregunta, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
             }else{
                 respuesta.classList.add("incorrecta"); // le ponemos la clase incorrecta
-                alert("Respuesta incorrecta!");
+                setTimeout(()=>{ alert("Respuesta incorrecta!");},500); // mostramos un mensaje dentro de medio segundo
+                preguntaActual = 0; // volvemos a la primera pregunta
+                setTimeout(crearPregunta, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
             }
         })
         respuestas.push(respuesta);
