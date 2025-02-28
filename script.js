@@ -64,30 +64,31 @@ function crearPregunta(preguntas,preguntaActual) {
 }
 function crearRespuestas(pregunta){
     // creamos los botones de las respuestas
-    const respuesta1 = document.createElement("button");
-    const respuesta2 = document.createElement("button");
-    const respuesta3 = document.createElement("button");
-    const respuesta4 = document.createElement("button");
-
-    // damos los textos a las respuestas
-    respuesta1.textContent = pregunta.respuestas[0];
-    respuesta2.textContent = pregunta.respuestas[1];
-    respuesta3.textContent = pregunta.respuestas[2];
-    respuesta4.textContent = pregunta.respuestas[3];
-
-    // damos las clases a las respuestas
-    respuesta1.classList.add("respuesta");
-    respuesta2.classList.add("respuesta");
-    respuesta3.classList.add("respuesta");
-    respuesta4.classList.add("respuesta");
+    // para mayor comodidad, crearemos un array donde guardaremos los botones
+    const respuestas = [];
+    for(let i = 0; i < pregunta.respuestas.length; i++){
+        const respuesta = document.createElement("button"); // creamos el botón
+        respuesta.textContent = pregunta.respuestas[i]; // le añadimos el texto
+        respuesta.classList.add("respuesta"); // le añadimos la clase
+        respuesta.addEventListener("click", function() { // añadimos el listener para ver si es la correcta
+            if(i === pregunta.correcta){ // si la posición de la respuesta coincide con la correcta
+                respuesta.classList.add("correcta"); // le ponemos la clase correcta
+                alert("Respuesta correcta!");
+            }else{
+                respuesta.classList.add("incorrecta"); // le ponemos la clase incorrecta
+                alert("Respuesta incorrecta!");
+            }
+        })
+        respuestas.push(respuesta);
+    }
 
     // añadimos las respuestas a la pantalla
     const seccionRespuestas  = document.getElementById("respuestas");
     seccionRespuestas.innerHTML = ""; // vaciamos la sección para quitar las respuestas anteriores
-    seccionRespuestas.appendChild(respuesta1);
-    seccionRespuestas.appendChild(respuesta2);
-    seccionRespuestas.appendChild(respuesta3);
-    seccionRespuestas.appendChild(respuesta4);
+    for(let i = 0; i < respuestas.length; i++){ // para cada respuesta, la ponemos en la sección
+        seccionRespuestas.appendChild(respuestas[i]);
+    }
+
 
 }
 
