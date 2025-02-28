@@ -53,6 +53,51 @@ const preguntas = [// array de preguntas, cada pregunta tiene 4 respuestas posib
 
 let preguntaActual = 0;
 
+function crearPaginaInicio() {
+    // borramos las secciones de preguntas y respuestas
+    const seccionPregunta = document.getElementById("preguntas");
+    seccionPregunta.innerHTML = "";
+    const seccionRespuestas = document.getElementById("respuestas");
+    seccionRespuestas.innerHTML = "";
+
+    // buscamos la sección 'menu' para mostrar el botón de comenzar
+    const seccionInicio = document.getElementById("menu");
+    seccionInicio.innerHTML = "";
+    const botonComenzar = document.createElement("button");
+    botonComenzar.textContent = "Comenzar";
+
+    botonComenzar.addEventListener("click", () => {
+        seccionInicio.innerHTML = ""; // borramos el mensaje de la sección de inicio
+        preguntaActual = 0;
+        crearPregunta(); // creamos la primera pregunta
+    });
+    seccionInicio.appendChild(botonComenzar);
+
+}
+function crearPaginaFinal() {
+    // borramos las secciones de preguntas y respuestas
+    const seccionPregunta = document.getElementById("preguntas");
+    seccionPregunta.innerHTML = "";
+    const seccionRespuestas = document.getElementById("respuestas");
+    seccionRespuestas.innerHTML = "";
+
+    // buscamos la sección 'menu' para mostrar la puntuación obtenida
+    const seccionFinal = document.getElementById("menu");
+    seccionFinal.innerHTML = "";
+    const puntuacion = document.createElement("p");
+    puntuacion.textContent = `Puntuación: ${preguntaActual * 10}`;
+    seccionFinal.appendChild(puntuacion);
+
+    // creamos el botón de volver a jugar
+    const botonVolver = document.createElement("button");
+    botonVolver.textContent = "Volver a jugar";
+    botonVolver.addEventListener("click", () => {
+        seccionFinal.innerHTML = ""; // borramos el mensaje de la sección de inicio
+        preguntaActual = 0;
+        crearPaginaInicio(); // creamos la primera pregunta
+    });
+    seccionFinal.appendChild(botonVolver);
+}
 function crearPregunta() {
     const pregunta = preguntas[preguntaActual];
     const seccionPregunta = document.getElementById("preguntas");
@@ -62,39 +107,41 @@ function crearPregunta() {
     seccionPregunta.appendChild(h2);
     crearRespuestas(pregunta);
 }
-function crearRespuestas(pregunta){
+function crearRespuestas(pregunta) {
     // creamos los botones de las respuestas
     // para mayor comodidad, crearemos un array donde guardaremos los botones
     const respuestas = [];
-    for(let i = 0; i < pregunta.respuestas.length; i++){
+    for (let i = 0; i < pregunta.respuestas.length; i++) {
         const respuesta = document.createElement("button"); // creamos el botón
         respuesta.textContent = pregunta.respuestas[i]; // le añadimos el texto
         respuesta.classList.add("respuesta"); // le añadimos la clase
-        respuesta.addEventListener("click", function() { // añadimos el listener para ver si es la correcta
-            if(i === pregunta.correcta){ // si la posición de la respuesta coincide con la correcta
+        respuesta.addEventListener("click", function () { // añadimos el listener para ver si es la correcta
+            if (i === pregunta.correcta) { // si la posición de la respuesta coincide con la correcta
                 respuesta.classList.add("correcta"); // le ponemos la clase correcta
-                setTimeout(()=>{ alert("Respuesta correcta!");},500); // mostramos un mensaje dentro de medio segundo
-               
                 preguntaActual++; // pasamos a la siguiente pregunta
-                setTimeout(crearPregunta, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
-            }else{
+                
+                if(preguntaActual  >= preguntas.length) { // si ya no quedan preguntas
+                    setTimeout(crearPaginaFinal, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
+                }else{
+                    setTimeout(crearPregunta, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
+                }
+            } else {
                 respuesta.classList.add("incorrecta"); // le ponemos la clase incorrecta
-                setTimeout(()=>{ alert("Respuesta incorrecta!");},500); // mostramos un mensaje dentro de medio segundo
-                preguntaActual = 0; // volvemos a la primera pregunta
-                setTimeout(crearPregunta, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
+                setTimeout(crearPaginaFinal, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
             }
         })
         respuestas.push(respuesta);
     }
 
     // añadimos las respuestas a la pantalla
-    const seccionRespuestas  = document.getElementById("respuestas");
+    const seccionRespuestas = document.getElementById("respuestas");
     seccionRespuestas.innerHTML = ""; // vaciamos la sección para quitar las respuestas anteriores
-    for(let i = 0; i < respuestas.length; i++){ // para cada respuesta, la ponemos en la sección
+    for (let i = 0; i < respuestas.length; i++) { // para cada respuesta, la ponemos en la sección
         seccionRespuestas.appendChild(respuestas[i]);
     }
 
 
 }
 
-crearPregunta(preguntas,preguntaActual);
+//crearPregunta(preguntas,preguntaActual);
+crearPaginaInicio();
