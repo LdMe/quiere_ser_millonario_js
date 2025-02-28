@@ -69,6 +69,7 @@ function crearPaginaInicio() {
     botonComenzar.textContent = "Comenzar";
 
     botonComenzar.addEventListener("click", () => {
+        document.removeEventListener("click",crearAudioInicio); // borramos el listener para no repetir el audio de inicio
         seccionInicio.innerHTML = ""; // borramos el mensaje de la sección de inicio
         preguntaActual = 0;
         crearPregunta(); // creamos la primera pregunta
