@@ -70,6 +70,7 @@ function crearPaginaInicio() {
         seccionInicio.innerHTML = ""; // borramos el mensaje de la sección de inicio
         preguntaActual = 0;
         crearPregunta(); // creamos la primera pregunta
+        crearComodines(); // creamos los comodines
     });
     seccionInicio.appendChild(botonComenzar);
 
@@ -115,11 +116,13 @@ function crearRespuestas(pregunta) {
         const respuesta = document.createElement("button"); // creamos el botón
         respuesta.textContent = pregunta.respuestas[i]; // le añadimos el texto
         respuesta.classList.add("respuesta"); // le añadimos la clase
+        respuesta.setAttribute("id", "respuesta" + i); // le aádimos el id
+
         respuesta.addEventListener("click", function () { // añadimos el listener para ver si es la correcta
             if (i === pregunta.correcta) { // si la posición de la respuesta coincide con la correcta
                 respuesta.classList.add("correcta"); // le ponemos la clase correcta
                 preguntaActual++; // pasamos a la siguiente pregunta
-                
+
                 if(preguntaActual  >= preguntas.length) { // si ya no quedan preguntas
                     setTimeout(crearPaginaFinal, 3000); //  creamos la siguiente pregunta en 3 segundos (3000 milisegundos)
                 }else{
@@ -141,6 +144,88 @@ function crearRespuestas(pregunta) {
     }
 
 
+}
+
+// crear los comodines del juego
+function crearComodines(){
+    const seccionComodines = document.getElementById("comodines");
+
+    const comodin50 = document.createElement("button");
+    comodin50.textContent = "50%";
+    seccionComodines.appendChild(comodin50);
+    
+    const comodinLlamada = document.createElement("button");
+    comodinLlamada.textContent = "Llamada";
+    seccionComodines.appendChild(comodinLlamada);
+
+    const comodinPublico = document.createElement("button");
+    comodinPublico.textContent = "Público";
+    seccionComodines.appendChild(comodinPublico);
+
+    // el comodin del 50% borra dos de las respuestas incorrectas
+    comodin50.addEventListener("click", () => {
+        const pregunta = preguntas[preguntaActual]; // sacamos la pregunta actual
+        const respuestaCorrecta  =pregunta.correcta; // buscamos la respuesta correcta
+        let otraRespuesta  = Math.floor(Math.random() * 4); // buscamos una respuesta al azar
+        while (otraRespuesta === respuestaCorrecta) { // si la respuesta coincide con la correcta seguimos buscando
+            otraRespuesta = Math.floor(Math.random() * 4);
+        }
+        const botones = document.querySelectorAll(".respuesta"); // buscamos todos los botones de respuesta
+        for(let i = 0; i < botones.length; i++){
+            const boton = botones[i];
+            if(boton.id !== "respuesta" + respuestaCorrecta && boton.id !== "respuesta" + otraRespuesta){ // si el id no coincide con la correcta o la otra elegida
+                boton.remove(); // borramos el botón
+            }
+        }
+        comodin50.remove();// borramos el botón del comodin del 50% para no poder volver a usarlo
+    });
+
+    // El comodín de la llamada te dirá cuál es la respuesta que tu amigo cree que es correcta
+    comodinLlamada.addEventListener("click", () => {
+        const pregunta = preguntas[preguntaActual]; // sacamos la pregunta actual
+        const respuestaCorrecta  =pregunta.correcta; // buscamos la respuesta correcta
+        const probabilidadDeAcierto = 0.6 // nuestro amigo tiene un 60% de probabilidad de acertar
+        let respuestaSeleccionada = respuestaCorrecta;
+        if(Math.random() > probabilidadDeAcierto){ // si el numero aleatorio es mayor que 0.75
+            respuestaSeleccionada = Math.floor(Math.random() * 4); // escogemos una respuesta al azar
+        }
+        alert("Tu amigo ha escogido la respuesta: "+pregunta.respuestas[respuestaSeleccionada])
+        comodinLlamada.remove();
+    });
+
+    // El comodín del público te dirá cuales son las respuestas más votadas
+    comodinPublico.addEventListener("click", () => {
+        const pregunta = preguntas[preguntaActual]; 
+        const respuestaCorrecta = pregunta.correcta;
+        const totalProbabilidad = 100;
+        const probabilidadesRespuestas = new Array(pregunta.respuestas.length).fill(0); // array con las probabilidades de cada respuesta, lo creamos con valores de 0
+    
+        // Probabilidad base para cada respuesta
+        let probabilidadesBase = pregunta.respuestas.map((_, i) => 
+            i === respuestaCorrecta ? Math.random() * 50 + 20 : Math.random() * 40 // Correcta: 20-70%, Incorrectas: 0-40%
+        );
+    
+        // Normalizar para que la suma total sea 100%
+        let sumaTotal = probabilidadesBase.reduce((acc, p) => acc + p, 0);
+        let factorNormalizacion = totalProbabilidad / sumaTotal;
+        
+        for (let i = 0; i < probabilidadesBase.length; i++) {
+            probabilidadesRespuestas[i] = Math.round(probabilidadesBase[i] * factorNormalizacion);
+        }
+    
+        // Ajustar posibles desajustes en la suma por redondeo
+        let ajuste = totalProbabilidad - probabilidadesRespuestas.reduce((acc, p) => acc + p, 0);
+        if (ajuste !== 0) {
+            let indexAjuste = Math.floor(Math.random() * pregunta.respuestas.length);
+            probabilidadesRespuestas[indexAjuste] += ajuste;
+        }
+        // unimos las respuestas para mostrarlas en un solo texto
+        const respuestaPublico = probabilidadesRespuestas.map((probabilidad, i) => `${pregunta.respuestas[i]}: ${probabilidad}%`).join(",\n");
+        alert("Distribución de votos del público:\n"+ respuestaPublico);
+        comodinPublico.remove();
+    });
+    
+    
 }
 
 //crearPregunta(preguntas,preguntaActual);
